@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Surprise for Priyanshi 💖</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --pink: #ff69b4; --purple: #9b59b6; --bg-dark: #0a0a12; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-dark); color: white; overflow-x: hidden; }
+
+        .stage { display: none; min-height: 100vh; width: 100%; padding: 40px 20px; text-align: center; }
+        .stage.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* COVER PAGE */
+        #cover-page { 
+            background: linear-gradient(135deg, #ff69b4, #9b59b6); position: fixed; 
+            top:0; left:0; height: 100%; width:100%; z-index: 9999; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .gift-box { font-size: 110px; cursor: pointer; animation: bounce 1.2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        #intro-text { font-size: 1.1rem; line-height: 1.8; max-width: 500px; margin-bottom: 20px; color: #ffcae3; text-align: left; padding: 25px; border-left: 4px solid white; white-space: pre-line; }
+
+        /* CAKE SECTION */
+        .cake-container { position: relative; width: 320px; margin-top: 50px; }
+        .cake-img { width: 100%; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .cake-photo-frame {
+            position: absolute; top: 42%; left: 50%; transform: translate(-50%, -50%);
+            width: 110px; height: 110px; border: 4px solid white; border-radius: 50%;
+            overflow: hidden; box-shadow: 0 0 15px rgba(255,105,180,0.8); background: #eee;
+        }
+        .cake-photo-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+        .cake-text { position: absolute; bottom: 20px; width: 100%; text-align: center; font-family: 'Pacifico'; color: #fff; text-shadow: 2px 2px 8px rgba(0,0,0,1); font-size: 1.3rem; }
+        
+        .candles-setup { position: absolute; top: -30px; width: 100%; display: flex; justify-content: center; align-items: flex-end; height: 100px; gap: 15px; }
+        .candle { font-size: 45px; cursor: pointer; transition: 0.3s; }
+        .candle.blown { opacity: 0.2; filter: grayscale(1); transform: translateY(10px); }
+
+        /* GALLERY & BUTTONS */
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; width: 100%; max-width: 1100px; padding: 20px; }
+        .polaroid { background: white; padding: 12px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: rotate(var(--r)); display: flex; flex-direction: column; align-items: center; }
+        .polaroid img { width: 100%; height: 380px; object-fit: cover; }
+        .btn { background: var(--pink); color: white; padding: 15px 40px; border-radius: 50px; border: none; font-weight: bold; margin-top: 30px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255,105,180,0.4); }
+        .msg-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 400px; background: rgba(255, 105, 180, 0.98); color: white; padding: 25px; border-radius: 20px; display: none; z-index: 10000; text-align: center; line-height: 1.6; border: 2px solid white; }
+
+        /* 3D CUBE */
+        .cube-wrapper { perspective: 1000px; margin: 40px 0; }
+        .cube { position: relative; height: 180px; width: 180px; transform-style: preserve-3d; animation: rotateCube 15s infinite linear; margin: auto; }
+        .cube div { position: absolute; width: 180px; height: 180px; background: white; border: 2px solid var(--pink); }
+        .cube img { width: 100%; height: 100%; object-fit: cover; }
+        .front { transform: translateZ(90px); } .back { transform: translateZ(-90px) rotateY(180deg); }
+        .right { transform: rotateY(-90deg) translateX(90px); transform-origin: top right; }
+        .left { transform: rotateY(90deg) translateX(-90px); transform-origin: center left; }
+        .top { transform: rotateX(-90deg) translateY(-90px); transform-origin: top center; }
+        .bottom { transform: rotateX(90deg) translateY(90px); transform-origin: bottom center; }
+        @keyframes rotateCube { from { transform: rotateX(0) rotateY(0); } to { transform: rotateX(360deg) rotateY(360deg); } }
+
+        /* SLIDESHOW STAGE */
+        .slideshow-wrapper { position: relative; width: 100%; max-width: 400px; }
+        .slideshow-container { position: relative; width: 100%; height: 480px; border: 8px solid white; border-radius: 15px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; }
+        .slide { display: none; width: 100%; height: 100%; object-fit: cover; animation: fade 1.5s; }
+        .slide-caption { margin-top: 15px; font-style: italic; color: gold; min-height: 50px; font-size: 1.1rem; }
+        #love-msg-final { display: none; font-family: 'Pacifico'; color: var(--pink); font-size: 3rem; text-align: center; animation: bounce 1.2s infinite; }
+        @keyframes fade { from {opacity: .4} to {opacity: 1} }
+    </style>
+</head>
+<body>
+
+    <audio id="main-audio"></audio>
+
+    <section id="cover-page" class="active">
+        <h2 style="font-family:'Pacifico'; color:white; margin-bottom:30px;">Priyanshi, Tap to open! 🎁</h2>
+        <div class="gift-box" onclick="startSurprise()">🎁</div>
+    </section>
+
+    <section id="timer-stage" class="stage">
+        <div id="intro-text"></div>
+        <div id="prep-box" style="display:none;">
+            <p style="color: gold; margin-bottom: 10px; font-weight: bold; font-style: italic;">(Read every message slowly... ✨)</p>
+            <h2 style="font-family:'Pacifico'; color:var(--pink);">A small effort, a big feeling...</h2>
+            <div id="timer-num" style="font-size: 5rem; color: gold; font-weight: bold; margin: 20px;">10</div>
+            <button id="ready-btn" class="btn" onclick="startJourney()" style="display:none;">Are you ready? ✨</button>
+        </div>
+    </section>
+
+    <section id="memory-lane" class="stage">
+        <h2 style="font-family:'Pacifico'; color:var(--pink); margin-bottom:20px;">Memories & Secret Notes 💌</h2>
+        <div class="gallery" id="photo-grid"></div>
+        <div id="msg-popup" class="msg-popup" onclick="this.style.display='none'"></div>
+        <button class="btn" onclick="showStage('cake-stage')">Next: The Cake 🎂</button>
+    </section>
+
+    <section id="cake-stage" class="stage">
+        <h2 style="font-family:'Pacifico'; color: gold; margin-bottom:40px;">Make a wish & Blow! 🎂</h2>
+        <div class="cake-container">
+            <div class="candles-setup">
+                <div class="candle" onclick="blowCandle(this)">🕯️🔥</div>
+                <div class="candle" onclick="blowCandle(this)">🕯️🔥</div>
+                <div class="candle" onclick="blowCandle(this)">🕯️🔥</div>
+                <div class="candle" onclick="blowCandle(this)">🕯️🔥</div>
+                <div class="candle" onclick="blowCandle(this)">🕯️🔥</div>
+            </div>
+            <img src="cake.jpeg" class="cake-img">
+            <div class="cake-photo-frame"><img src="image 1.jpg"></div>
+            <div class="cake-text">Happy Birthday Priyanshi</div>
+        </div>
+        <button id="letter-btn" class="btn" style="display:none;" onclick="showStage('letter-stage')">Read My Letter ✉</button>
+    </section>
+
+    <section id="letter-stage" class="stage">
+        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 550px; text-align: left; color: #222; border-left: 10px solid var(--pink); white-space: pre-line; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <h3 style="font-family:'Pacifico'; color:var(--purple); margin-bottom:10px;">Dear Priyanshi 💖</h3>
+            Happy Birthday 🎂✨
+            I thought a lot before writing this… because sometimes, the simplest feelings are the hardest to put into words.
+            There are people we meet, talk to, and then move on from… and then there are a few who leave a quiet impact, even without trying too hard. You’re one of those people.
+            It’s strange how some connections don’t need constant conversations to feel meaningful. They just exist… in a calm, unspoken way.
+            I don’t know how to explain it perfectly, but your presence has always felt… peaceful. Not loud, not complicated—just something that feels nice to have.
+            Life doesn’t always go the way we expect, and not every phase stays the same. But I’ve learned that some people don’t fade away completely—they stay in small thoughts, in random moments, in a quiet corner of your mind. And you’re one of those people for me.
+            I won’t make big promises or say things just for the sake of it. I just want to keep it simple and honest—I respect you, I appreciate you, and somewhere, I value this connection in my own way.
+            On your birthday, I just hope life treats you gently, gives you reasons to smile often, and surrounds you with positivity and peace. You deserve good things—not just today, but in all the days ahead.
+            Happy Birthday once again, Priyanshi 💖
+            Take care of yourself… always. ✨
+
+            **Love you 💖**
+        </div>
+        <button class="btn" onclick="showStage('wish-stage')">Next Surprise 🎁</button>
+    </section>
+
+    <section id="wish-stage" class="stage">
+        <div style="color:white; font-style:italic; padding:25px; font-size: 1.2rem; line-height: 1.8; max-width: 600px; border: 1px dashed var(--pink); border-radius: 15px; background: rgba(255,255,255,0.05);">
+            “If I could wish one thing for you… It wouldn’t be something big or complicated. I’d just wish that no matter where life takes you, you always find reasons to smile, and never feel alone in your journey. And even from a distance, there will always be someone quietly hoping that everything goes right for you. 💖✨”
+        </div>
+        <button class="btn" onclick="goToFinal()">Open The Final Gift 💣</button>
+    </section>
+
+    <section id="bomb-stage" class="stage">
+        <h2 style="font-family:'Pacifico'; color:gold; font-size: 2.5rem;">BOOM! 👑</h2>
+        <div class="cube-wrapper">
+            <div class="cube" id="final-cube"></div>
+        </div>
+        <button class="btn" style="background:gold; color:black;" onclick="startSlideshow()">Final Message 💌</button>
+    </section>
+
+    <section id="slideshow-stage" class="stage">
+        <div class="slideshow-wrapper">
+            <div class="slideshow-container" id="slideshow-box">
+                <div id="love-msg-final">Love You 💖</div>
+            </div>
+            <div id="caption-text" class="slide-caption"></div>
+        </div>
+    </section>
+
+    <script>
+        const audio = document.getElementById('main-audio');
+        
+        // RESTORED 12 LONG MESSAGES
+        const messages = [
+            "Happy Birthday Priyanshi 🎂💖\nYou know… some people come into our lives unexpectedly, and without even realizing it, they become important. That’s exactly how it was with you. It wasn’t about how long we talked, but how real everything felt.",
+            "Then life happened… and we stopped talking. Days slowly turned into months, and silence became something we both got used to. But the strange thing is… this bond never really felt over to me.",
+            "That time apart made me realize something important… Not every connection is meant to be constant, but some are meant to be real. Even without conversations, some people never really leave your thoughts.",
+            "I know you have a lot of friends in your life, and maybe I’m not the most important one—and that’s okay. I don’t look at this bond in terms of importance. For me, what matters is that you’re in my life again.",
+            "There’s something else I want to be honest about… In the past, I’ve lost some really beautiful friendships. They made me more careful, a little scared to get attached again. But somehow… this bond with you still felt worth holding onto.",
+            "I just want you to know that I genuinely care about you. Your happiness, your peace, your little smiles—everything matters. Even when we weren’t talking, I still wished good for you. You’ll always have a soft place in my heart 💖",
+            "Some bonds don’t need daily conversations to stay alive. They exist in memories, in random thoughts, and in the comfort of knowing that person still matters. Simple… but real.",
+            "Sometimes I think… Life removes people not to end things, but to show us their true value. And maybe that’s what happened here. Because after everything, this bond still found its way back.",
+            "Priyanshi… I don’t really expect anything from you. I’ve just learned to care without expecting anything back. If caring too much was a job, I’d be Employee of the Month 💖",
+            "So on your special day… I just want you to feel appreciated, loved, and truly special. Because you are. Not just today… but in ways you might not even realize.",
+            "I’m really glad that life gave this bond another chance. Not everything perfect stays, but real things somehow return. ‘Some people stay in your story in some way.’",
+            "I’m just happy you’re part of mine, Priyanshi 💖\nStay happy, keep smiling… because your smile really matters 😄✨ Happy Birthday once again 🎂💖"
+        ];
+
+        // SMALL MESSAGES FOR SLIDESHOW
+        const smallCaptions = [
+            "Your presence is a gift... ✨",
+            "Keep that beautiful smile forever! 😊",
+            "A bond beyond words... 🤝",
+            "You are truly special to me. 💖",
+            "Grateful for every memory. 📸",
+            "The world is better with you in it! 🌍",
+            "Always wishing the best for you. 🌟",
+            "Stay simple, stay real. ✨",
+            "A new chapter begins today... 📖",
+            "May your days be full of light! 🕯️",
+            "Forever cheering for you! 📣",
+            "Ending this journey with lots of love... 💖"
+        ];
+
+        function playMusic(src) {
+            audio.pause(); audio.src = src; audio.load(); audio.loop = true;
+            audio.play().catch(e => console.log("Blocked"));
+        }
+
+        function startSurprise() {
+            playMusic('saavane-happy-birthday-254480.mp3');
+            document.getElementById('cover-page').style.display = 'none';
+            showStage('timer-stage');
+            const intro = "“Hey Priyanshi… 💖\nBefore you scroll, just pause for a moment…\nBecause this isn’t just a simple birthday wish.\nIt’s something I made with real feelings...\nSo… take a deep breath,\nand start this little journey ✨”";
+            let i = 0; const target = document.getElementById('intro-text');
+            function type() {
+                if(i < intro.length) {
+                    target.innerHTML += intro.charAt(i); i++; setTimeout(type, 40);
+                } else {
+                    document.getElementById('prep-box').style.display = 'block';
+                    startTimer();
+                }
+            }
+            type();
+        }
+
+        function startTimer() {
+            let count = 10;
+            const tNum = document.getElementById('timer-num');
+            const interval = setInterval(() => {
+                count--; tNum.innerText = count;
+                if(count <= 0) { 
+                    clearInterval(interval); tNum.style.display = 'none'; 
+                    document.getElementById('ready-btn').style.display = 'inline-block'; 
+                }
+            }, 1000);
+        }
+
+        function startJourney() {
+            playMusic('Yaaron(PagaiWorld.com).mp3');
+            showStage('memory-lane');
+            const grid = document.getElementById('photo-grid');
+            for(let i=1; i<=12; i++) {
+                grid.innerHTML += `<div class="polaroid" style="--r:${Math.random()*12-6}deg"><img src="image ${i}.jpg"><button style="background:var(--pink); color:white; padding:8px 15px; border-radius:20px; border:none; margin-top:10px; cursor:pointer;" onclick="showNote(${i-1})">Read Note 💌</button></div>`;
+            }
+        }
+
+        let blown = 0;
+        function blowCandle(el) {
+            if(!el.classList.contains('blown')) {
+                el.classList.add('blown'); blown++;
+                if(blown === 5) {
+                    confetti({ particleCount: 200, spread: 100 });
+                    document.getElementById('letter-btn').style.display = 'inline-block';
+                }
+            }
+        }
+
+        function goToFinal() {
+            showStage('bomb-stage');
+            confetti({ particleCount: 800, spread: 200 });
+            const cube = document.getElementById('final-cube');
+            const faces = ['front','back','right','left','top','bottom'];
+            faces.forEach((f, i) => { cube.innerHTML += `<div class="${f}"><img src="image ${i+1}.jpg"></div>`; });
+        }
+
+        function startSlideshow() {
+            showStage('slideshow-stage');
+            const box = document.getElementById('slideshow-box');
+            const loveMsg = document.getElementById('love-msg-final');
+            const captionBox = document.getElementById('caption-text');
+            
+            for(let i=1; i<=12; i++) { 
+                const img = document.createElement('img');
+                img.className = 'slide'; img.src = `image ${i}.jpg`;
+                box.insertBefore(img, loveMsg);
+            }
+
+            let slideIdx = 0;
+            const slides = document.getElementsByClassName("slide");
+
+            function showSlides() {
+                for (let i = 0; i < slides.length; i++) slides[i].style.display = "none";
+                slideIdx++;
+                if (slideIdx > slides.length) { 
+                    loveMsg.style.display = 'block'; 
+                    captionBox.style.display = 'none';
+                    confetti({ particleCount: 200 }); 
+                    return; 
+                }
+                slides[slideIdx-1].style.display = "block";
+                captionBox.innerText = smallCaptions[slideIdx-1]; 
+                setTimeout(showSlides, 3000);
+            }
+            showSlides();
+        }
+
+        function showNote(i) {
+            const p = document.getElementById('msg-popup');
+            p.innerText = messages[i]; 
+            p.style.display = 'block';
+            confetti({ particleCount: 30, spread: 50 });
+        }
+
+        function showStage(id) {
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active'); window.scrollTo(0,0);
+        }
+    </script>
+</body>
+</html>
